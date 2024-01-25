@@ -74,8 +74,8 @@ class ExcelReaderWriter:
     Return Type : Void
     """
     def setTestData(self, sheetName, testCaseName, colName , orderNumber ):
-        self.excelFilePath = self.getTempFileName(self.originalFilePath)   # temporary file
-        self.excelFilePath = self.getTempFileName(os.path.join(self.getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
+        self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
+        self.excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
         shutil.copyfile(self.originalFilePath, self.excelFilePath)  # create a copy
         self.wb = openpyxl.load_workbook(self.excelFilePath)
         sheet = self.wb[sheetName]
@@ -101,7 +101,7 @@ class ExcelReaderWriter:
         # Update the data attribute
         if sheetName in self.data and testCaseName in self.data[sheetName]:
             self.data[sheetName][testCaseName][colName] = orderNumber
-        self.save_and_close()
+        self.__save_and_close()
 
     
     """
@@ -113,7 +113,7 @@ class ExcelReaderWriter:
     The resulting temporary filename maintains the original file type and is unlikely to conflict with existing files due to the inclusion of a random number.
     Return Type : String
     """
-    def getTempFileName(self, filename):
+    def __getTempFileName(self, filename):
         base_name = os.path.splitext(filename)[0]  # get the base name of the file (without extension)
         extension = os.path.splitext(filename)[1]  # get the file extension
         random_number = random.randint(1, 1000)  # generate a random number between 1 and 1000
@@ -131,7 +131,7 @@ class ExcelReaderWriter:
     This approach helps maintain the integrity of the original file by preventing partial updates.
     Return Type : Void
     """
-    def save_and_close(self):
+    def __save_and_close(self):
         self.wb = openpyxl.load_workbook(self.excelFilePath)
         self.wb.save(self.excelFilePath)
         self.wb.close()
@@ -148,7 +148,7 @@ class ExcelReaderWriter:
     This method is useful for managing temporary files that are created during the execution of this script.
     Return Type : String
     """
-    def getCopyFolder_directory(self):
+    def __getCopyFolder_directory(self):
         current_directory = os.path.dirname(os.path.realpath('__file__'))
         copyFolder_directory = os.path.join(current_directory, 'CopyFolder')
         if not os.path.isdir(copyFolder_directory):
@@ -243,8 +243,8 @@ class ExcelReaderWriter:
     def modifyColorAndFontOfTheCell(self, sheetName, testCaseName, colName , cell_color='FFFFFF', font_color='000000', font_type=False):
         change_cell_color = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
         change_font = Font(color=Color(rgb=font_color), bold=font_type)
-        self.excelFilePath = self.getTempFileName(self.originalFilePath)   # temporary file
-        self.excelFilePath = self.getTempFileName(os.path.join(self.getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
+        self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
+        self.excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
         shutil.copyfile(self.originalFilePath, self.excelFilePath)  # create a copy
         self.wb = openpyxl.load_workbook(self.excelFilePath)
         sheet = self.wb[sheetName]
@@ -263,7 +263,7 @@ class ExcelReaderWriter:
                 break
         self.wb.save(self.excelFilePath)
         self.wb.close()
-        self.save_and_close()
+        self.__save_and_close()
 
 
 

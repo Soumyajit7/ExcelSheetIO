@@ -9,7 +9,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 
 setup(
     name='ExcelSheetIO',
-    version='0.1',
+    version='0.0.1',
     author="Soumyajit Pan",
     author_email="soumyajitpan29@gmail.com",
     packages=find_packages(),
