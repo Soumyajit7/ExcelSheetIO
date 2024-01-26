@@ -6,6 +6,9 @@ A Python package for efficient Excel sheet operations. Enables easy read/write f
 
 ```python
 pip install ExcelSheetIO
+
+# For upgrade to the latest version
+pip install --upgrade ExcelSheetIO 
 ```
 
 ## Method : `Read Data From Excel Sheet`
@@ -349,12 +352,17 @@ excel_reader_writer.modifyColorAndFontOfTheCell('sheetName', 'uniqueIdentifier',
 In Robot Framework, you can call this method in a similar way. First, you need to create a keyword that calls this method, and then you can use this keyword in your test case:
 
 ```robotframework
+*** Settings ***
+Library    ExcelSheetIO.ExcelReaderWriter    .\\Data\\Employee.xlsx
+
 *** Keywords ***
-Modify Cell Color And Font
+Keyword for modify color and font of the cell in excel sheet
     [Arguments]    ${sheet_name}    ${test_case_name}    ${column_name}    ${cell_color}    ${font_color}    ${font_type}
-    Call Method    ${instance}    modifyColorAndFontOfTheCell    ${sheet_name}    ${test_case_name}    ${column_name}    ${cell_color}    ${font_color}    ${font_type}
+    Modify Color And Font Of The Cell    ${sheet_name}    ${test_case_name}    ${column_name}    ${cell_color}    ${font_color}    ${font_type}
+
 
 *** Test Cases ***
 Test Modify Cell Color And Font
-    Modify Cell Color And Font    Sheet1    TestCase1    ColumnName    FFFF00    000000    ${TRUE}  # Replace 'Sheet1', 'TestCase1', and 'ColumnName' with your sheet name, test case name, and column name
+    Keyword for modify color and font of the cell in excel sheet    Sheet1    E6    Job Title    ffb0b0    Ff0000    True  
+    # Replace 'Sheet1', 'TestCase1', and 'ColumnName' with your sheet name, test case name, and column name
 ```

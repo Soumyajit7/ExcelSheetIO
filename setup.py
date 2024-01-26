@@ -9,7 +9,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 
 setup(
     name='ExcelSheetIO',
-    version='0.3',
+    version='0.4',
     author="Soumyajit Pan",
     author_email="soumyajitmahi7@gmail.com",
     packages=find_packages(),
@@ -43,4 +43,6 @@ setup(
         'urllib3==2.1.0',
         'wsproto==1.2.0',
     ],
+    url="https://pypi.org/project/ExcelSheetIO/",
+    license="MIT",
 )
