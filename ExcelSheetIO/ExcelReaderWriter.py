@@ -26,12 +26,12 @@ class ExcelReaderWriter:
                 headers = [cell.value for cell in sheet[1]]
                 self.data[sheet_name] = {}
                 for row in sheet.iter_rows(min_row=2):
-                    test_case_name = row[0].value
-                    if test_case_name not in self.data[sheet_name]:
-                        self.data[sheet_name][test_case_name] = {}
+                    unique_identifier = row[0].value
+                    if unique_identifier not in self.data[sheet_name]:
+                        self.data[sheet_name][unique_identifier] = {}
                     for col_index, cell in enumerate(row):
                         col_name = headers[col_index]
-                        self.data[sheet_name][test_case_name][col_name] = cell.value
+                        self.data[sheet_name][unique_identifier][col_name] = cell.value
             wb.close()
         except FileNotFoundError:
             logger.error(f"Error : File {self.originalFilePath} not found")
@@ -43,24 +43,24 @@ class ExcelReaderWriter:
 
     """
     This method retrieves data from a specific cell in an Excel sheet. 
-    To use the 'getTestData' method, the following parameters are required:
+    To use the 'readCellData' method, the following parameters are required:
         - Sheet Name: The name of the Excel sheet from which data is to be retrieved.
-        - Test Case Name: The specific test case within the sheet for which data is needed.
+        - Unique Identifier: The specific unique identifier within the sheet for which data is needed.
         - Column Name: The column in the sheet that contains the desired data.
     By providing these parameters, the method can accurately locate and return the desired data from the Excel sheet.
     Return Type : String
     """
-    def getTestData(self, sheetName, testCaseName, colName):
+    def readCellData(self, sheetName, uniqueIdentifier, columnHeaderName):
         if sheetName in self.data:
-            if testCaseName in self.data[sheetName]:
-                if colName in self.data[sheetName][testCaseName]:
-                    return self.data[sheetName][testCaseName][colName]
+            if uniqueIdentifier in self.data[sheetName]:
+                if columnHeaderName in self.data[sheetName][uniqueIdentifier]:
+                    return self.data[sheetName][uniqueIdentifier][columnHeaderName]
                 else:
-                    return f"ColumnName : '{colName}' Not Found"
+                    return f"Column Header Name : '{columnHeaderName}' Not Found"
             else:
-                return f"TestCaseName : '{testCaseName}' Not Found"
+                return f"Unique Identifier : '{uniqueIdentifier}' Not Found"
         else:
-            return f"SheetName : '{sheetName}' Not Found"
+            return f"Sheet Name : '{sheetName}' Not Found"
 
 
     """
@@ -73,7 +73,7 @@ class ExcelReaderWriter:
     This strategy ensures that the original Excel file remains unchanged until all write operations are successfully executed.
     Return Type : Void
     """
-    def setTestData(self, sheetName, testCaseName, colName , orderNumber ):
+    def writeCellData(self, sheetName, uniqueIdentifier, columnHeaderName , orderNumber ):
         self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
         self.excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
         shutil.copyfile(self.originalFilePath, self.excelFilePath)  # create a copy
@@ -86,9 +86,9 @@ class ExcelReaderWriter:
             # print("Entered in Write For loop")
             testName = sheet.cell(i, 1).value
             # print(testName)
-            if testName == testCaseName:
+            if testName == uniqueIdentifier:
                 while (sheet.cell(row=1, column=colIndex).value != ''):
-                    if (colName == sheet.cell(row=1, column=colIndex).value):
+                    if (columnHeaderName == sheet.cell(row=1, column=colIndex).value):
                         break
                     colIndex = colIndex + 1
                 sheet.cell(i, colIndex).value = orderNumber
@@ -99,8 +99,8 @@ class ExcelReaderWriter:
         self.wb.close()
 
         # Update the data attribute
-        if sheetName in self.data and testCaseName in self.data[sheetName]:
-            self.data[sheetName][testCaseName][colName] = orderNumber
+        if sheetName in self.data and uniqueIdentifier in self.data[sheetName]:
+            self.data[sheetName][uniqueIdentifier][columnHeaderName] = orderNumber
         self.__save_and_close()
 
     
@@ -166,7 +166,7 @@ class ExcelReaderWriter:
     This method is useful for cleaning up temporary files that were created during the execution of this script.
     Return Type : Void
     """
-    def removeTestDataFiles(self):
+    def removeTemporaryTestDataFiles(self):
         global wb
         global excelFilePath
         fileDir = os.path.dirname(os.path.realpath('__file__'))
@@ -191,18 +191,18 @@ class ExcelReaderWriter:
     This method is useful for extracting all non-null data in a given column in a given sheet.
     Return Type : List
     """
-    def readAllDataInGivenColumn(self, sheetName, colName):
+    def readAllDataInGivenColumn(self, sheetName, columnHeaderName):
         if sheetName in self.data:
             column_data = []
-            for testCaseName in self.data[sheetName]:
-                if colName in self.data[sheetName][testCaseName] and self.data[sheetName][testCaseName][colName] != None:
-                    column_data.append(self.data[sheetName][testCaseName][colName])
+            for uniqueIdentifier in self.data[sheetName]:
+                if columnHeaderName in self.data[sheetName][uniqueIdentifier] and self.data[sheetName][uniqueIdentifier][columnHeaderName] != None:
+                    column_data.append(self.data[sheetName][uniqueIdentifier][columnHeaderName])
             if column_data:
                 return column_data
             else:
-                return f'No data found in column name-{colName} in Sheetname-{sheetName}'
+                return f'No data found in column name-{columnHeaderName} in Sheetname-{sheetName}'
         else:
-            return f'Sheetname-{sheetName} not found in data'
+            return f'Sheet Name-{sheetName} not found in data'
 
 
     """
@@ -216,23 +216,23 @@ class ExcelReaderWriter:
     This method is useful for extracting all data in a given row in a given sheet.
     Return Type : Dictonary
     """
-    def readAllDataInGivenRow(self, sheetName, testCaseName):
+    def readAllDataInGivenRow(self, sheetName, uniqueIdentifier):
         if sheetName in self.data:
-            if testCaseName in self.data[sheetName]:
-                row_data = self.data[sheetName][testCaseName]
+            if uniqueIdentifier in self.data[sheetName]:
+                row_data = self.data[sheetName][uniqueIdentifier]
                 return row_data
             else:
-                return f'Test case name-{testCaseName} not found in Sheetname-{sheetName}'
+                return f'Unique Identifier-{uniqueIdentifier} not found in Sheet Name-{sheetName}'
         else:
-            return f'Sheetname-{sheetName} not found in data'
+            return f'Sheet Name-{sheetName} not found in data'
 
 
     '''
     This method is used to modify the color and font of a specific cell in an Excel sheet.
     Parameters:
         sheetName (str): The name of the sheet in the workbook.
-        testCaseName (str): The name of the test case, used to find the specific row in the sheet.
-        colName (str): The name of the column, used to find the specific cell in the row.
+        uniqueIdentifier (str): The name of the test case, used to find the specific row in the sheet.
+        columnHeaderName (str): The name of the column, used to find the specific cell in the row.
         cell_color (str, optional): The color to fill the cell with. Defaults to 'FFFFFF'.
         font_color (str, optional): The color of the font in the cell. Defaults to '000000'.
         font_type (bool, optional): If True, the font will be bold. Defaults to False.
@@ -240,7 +240,7 @@ class ExcelReaderWriter:
     This method is particularly useful for highlighting specific test cases in an Excel sheet, such as failed test cases in a test suite.
     Return Type : Void
     '''
-    def modifyColorAndFontOfTheCell(self, sheetName, testCaseName, colName , cell_color='FFFFFF', font_color='000000', font_type=False):
+    def modifyColorAndFontOfTheCell(self, sheetName, uniqueIdentifier, columnHeaderName , cell_color='FFFFFF', font_color='000000', font_type=False):
         change_cell_color = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
         change_font = Font(color=Color(rgb=font_color), bold=font_type)
         self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
@@ -252,9 +252,9 @@ class ExcelReaderWriter:
         maxRow = sheet.max_row
         for i in range(1, maxRow + 1):
             testName = sheet.cell(i, 1).value
-            if testName == testCaseName:
+            if testName == uniqueIdentifier:
                 while (sheet.cell(row=1, column=colIndex).value != ''):
-                    if (colName == sheet.cell(row=1, column=colIndex).value):
+                    if (columnHeaderName == sheet.cell(row=1, column=colIndex).value):
                         break
                     colIndex = colIndex + 1
                 # print(sheet.cell(i, colIndex).fill.start_color.index)
@@ -270,7 +270,7 @@ class ExcelReaderWriter:
 if __name__=='__main__':    
     filepath = 'C:\\Users\\soumyajit.pan\\Documents\\Codes\\RobotProjectToTest_ExcelReaderWriter\\Data\\Employee.xlsx'
     e = ExcelReaderWriter(filepath)
-    # print(e.getTestData('Sheet1', 'E1', 'Full Name'))
+    # print(e.readCellData('Sheet1', 'E1', 'Full Name'))
     # row_data = e.readAllDataInGivenRow('Sheet1', 'E1')
     # print(row_data['Full Name'])
     # e.create_headers_in_excel_column('Sheet1')
