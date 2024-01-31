@@ -4,10 +4,10 @@ Developer :: soumyajitmahi7@gmail.com
 
 import os
 import openpyxl
-from openpyxl.styles import PatternFill, Font, Color
 from robot.api import logger
 import shutil  # for file operations
 import random
+from .CellStyler import CellStyler
 
 
 class ExcelReaderWriter:
@@ -16,27 +16,27 @@ class ExcelReaderWriter:
     This initial read operation loads the necessary data into memory, reducing the need for repeated I/O operations during the test run.
     '''
     def __init__(self, filename):
-        self.data = {}
-        self.originalFilePath = filename
-        self.wb = None
+        self.__data = {}
+        self.__originalFilePath = filename
+        self.__wb = None
         try:
-            wb = openpyxl.load_workbook(self.originalFilePath, read_only=True)
+            wb = openpyxl.load_workbook(self.__originalFilePath, read_only=True)
             for sheet_name in wb.sheetnames:
                 sheet = wb[sheet_name]
                 headers = [cell.value for cell in sheet[1]]
-                self.data[sheet_name] = {}
+                self.__data[sheet_name] = {}
                 for row in sheet.iter_rows(min_row=2):
                     unique_identifier = row[0].value
-                    if unique_identifier not in self.data[sheet_name]:
-                        self.data[sheet_name][unique_identifier] = {}
+                    if unique_identifier not in self.__data[sheet_name]:
+                        self.__data[sheet_name][unique_identifier] = {}
                     for col_index, cell in enumerate(row):
                         col_name = headers[col_index]
-                        self.data[sheet_name][unique_identifier][col_name] = cell.value
+                        self.__data[sheet_name][unique_identifier][col_name] = cell.value
             wb.close()
         except FileNotFoundError:
-            logger.error(f"Error : File {self.originalFilePath} not found")
+            logger.error(f"Error : File {self.__originalFilePath} not found")
         except PermissionError:
-            logger.error(f"Error : Permission denied to access file {self.originalFilePath}")
+            logger.error(f"Error : Permission denied to access file {self.__originalFilePath}")
         except Exception as e:
             logger.error(f"Error : {e}")
 
@@ -50,15 +50,31 @@ class ExcelReaderWriter:
     By providing these parameters, the method can accurately locate and return the desired data from the Excel sheet.
     Return Type : String
     """
-    def readCellData(self, sheetName, uniqueIdentifier, columnHeaderName):
-        if sheetName in self.data:
-            if uniqueIdentifier in self.data[sheetName]:
-                if columnHeaderName in self.data[sheetName][uniqueIdentifier]:
-                    return self.data[sheetName][uniqueIdentifier][columnHeaderName]
+    def readCellData(self, sheetName, uniqueIdentifierInRow, columnHeaderName):
+        """
+        This method retrieves data from a specific cell in a given sheet.
+
+        Parameters:
+        sheetName (str): The name of the sheet from which to retrieve data.
+        uniqueIdentifierInRow (str): The unique identifier used to locate the specific row in the sheet.
+        columnHeaderName (str): The name of the column header used to locate the specific column in the sheet.
+
+        Returns:
+        var: The data from the specified cell if the sheet, row, and column exist.
+        str: A message indicating that the column header, unique identifier, or sheet name was not found if either does not exist.
+
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> cell_data = e.readCellData('Sheet1', 'E5', 'Job Title')
+        """
+        if sheetName in self.__data:
+            if uniqueIdentifierInRow in self.__data[sheetName]:
+                if columnHeaderName in self.__data[sheetName][uniqueIdentifierInRow]:
+                    return self.__data[sheetName][uniqueIdentifierInRow][columnHeaderName]
                 else:
                     return f"Column Header Name : '{columnHeaderName}' Not Found"
             else:
-                return f"Unique Identifier : '{uniqueIdentifier}' Not Found"
+                return f"Unique Identifier : '{uniqueIdentifierInRow}' Not Found"
         else:
             return f"Sheet Name : '{sheetName}' Not Found"
 
@@ -73,12 +89,27 @@ class ExcelReaderWriter:
     This strategy ensures that the original Excel file remains unchanged until all write operations are successfully executed.
     Return Type : Void
     """
-    def writeCellData(self, sheetName, uniqueIdentifier, columnHeaderName , orderNumber ):
-        self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
-        self.excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
-        shutil.copyfile(self.originalFilePath, self.excelFilePath)  # create a copy
-        self.wb = openpyxl.load_workbook(self.excelFilePath)
-        sheet = self.wb[sheetName]
+    def writeCellData(self, sheetName, uniqueIdentifierInRow, columnHeaderName , writable_data):
+        """
+        This method writes data to a specific cell in a given sheet of an Excel file.
+
+        Parameters:
+        sheetName (str): The name of the sheet where the data will be written.
+        uniqueIdentifierInRow (str): The unique identifier used to locate the specific row in the sheet.
+        columnHeaderName (str): The name of the column header used to locate the specific column in the sheet.
+        writable_data: The data to be written to the specified cell.
+
+        The method first creates a temporary copy of the original Excel file. It then loads the workbook and identifies the sheet to be modified. It locates the specific cell by matching the uniqueIdentifierInRow and columnHeaderName. Once the cell is identified, it writes the provided data to the cell. Finally, it saves and closes the workbook.
+
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> e.writeCellData('Sheet1', 'E5', 'Job Title', 'Software Engineer')
+        """
+        self.__excelFilePath = self.__getTempFileName(self.__originalFilePath)   # temporary file
+        self.__excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.__originalFilePath)))   # temporary file
+        shutil.copyfile(self.__originalFilePath, self.__excelFilePath)  # create a copy
+        self.__wb = openpyxl.load_workbook(self.__excelFilePath)
+        sheet = self.__wb[sheetName]
         colIndex = 1
         maxRow = sheet.max_row
         # print(maxRow)
@@ -86,22 +117,22 @@ class ExcelReaderWriter:
             # print("Entered in Write For loop")
             testName = sheet.cell(i, 1).value
             # print(testName)
-            if testName == uniqueIdentifier:
+            if testName == uniqueIdentifierInRow:
                 while (sheet.cell(row=1, column=colIndex).value != ''):
                     if (columnHeaderName == sheet.cell(row=1, column=colIndex).value):
                         break
                     colIndex = colIndex + 1
-                sheet.cell(i, colIndex).value = orderNumber
+                sheet.cell(i, colIndex).value = writable_data
                 # print(sheet.cell(i, colIndex).value)
                 break
         # print("Come out of For Write loop")
-        self.wb.save(self.excelFilePath)
-        self.wb.close()
+        self.__wb.save(self.__excelFilePath)
+        self.__wb.close()
 
         # Update the data attribute
-        if sheetName in self.data and uniqueIdentifier in self.data[sheetName]:
-            self.data[sheetName][uniqueIdentifier][columnHeaderName] = orderNumber
-        self.__save_and_close()
+        if sheetName in self.__data and uniqueIdentifierInRow in self.__data[sheetName]:
+            self.__data[sheetName][uniqueIdentifierInRow][columnHeaderName] = writable_data
+        self.__save_and_close(self.__excelFilePath)
 
     
     """
@@ -131,12 +162,12 @@ class ExcelReaderWriter:
     This approach helps maintain the integrity of the original file by preventing partial updates.
     Return Type : Void
     """
-    def __save_and_close(self):
-        self.wb = openpyxl.load_workbook(self.excelFilePath)
-        self.wb.save(self.excelFilePath)
-        self.wb.close()
-        shutil.copyfile(self.excelFilePath, self.originalFilePath)  # copy data back to the original file
-        os.remove(self.excelFilePath)  # delete the temporary file
+    def __save_and_close(self, excelFilePath):
+        self.__wb = openpyxl.load_workbook(excelFilePath)
+        self.__wb.save(excelFilePath)
+        self.__wb.close()
+        shutil.copyfile(excelFilePath, self.__originalFilePath)  # copy data back to the original file
+        os.remove(excelFilePath)  # delete the temporary file
 
 
     """
@@ -167,16 +198,26 @@ class ExcelReaderWriter:
     Return Type : Void
     """
     def removeTemporaryTestDataFiles(self):
-        global wb
-        global excelFilePath
+        """
+        This method removes all temporary test data files from a specified directory.
+
+        It iterates over all files in the 'CopyFolder' directory located in the same directory as this script. If a file name contains the word 'temp', it attempts to remove that file.
+
+        If an OSError occurs during the removal of a file, it logs the error using a logger.
+
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> e.removeTemporaryTestDataFiles()
+        """
         fileDir = os.path.dirname(os.path.realpath('__file__'))
         my_dir = os.path.join(fileDir, 'CopyFolder')
-        for fname in os.listdir(my_dir):
-            if 'temp' in fname:
-                try:
-                    os.remove(os.path.join(my_dir, fname))
-                except OSError as error:
-                    logger.error(error)
+        if os.path.isdir(my_dir):
+            for fname in os.listdir(my_dir):
+                if 'temp' in fname:
+                    try:
+                        os.remove(os.path.join(my_dir, fname))
+                    except OSError as error:
+                        logger.error(error)
 
 
     """
@@ -192,11 +233,26 @@ class ExcelReaderWriter:
     Return Type : List
     """
     def readAllDataInGivenColumn(self, sheetName, columnHeaderName):
-        if sheetName in self.data:
+        """
+        This method retrieves all data in a specified column of a given sheet.
+
+        Parameters:
+        sheetName (str): The name of the sheet from which to retrieve data.
+        columnHeaderName (str): The name of the column header used to locate the specific column in the sheet.
+
+        Returns:
+        list: A list containing the data in the specified column if the sheet and column exist.
+        str: A message indicating that no data was found in the specified column or the sheet name was not found if either does not exist.
+        
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> column_data = e.readAllDataInGivenColumn('Sheet1', 'Job Title')
+        """
+        if sheetName in self.__data:
             column_data = []
-            for uniqueIdentifier in self.data[sheetName]:
-                if columnHeaderName in self.data[sheetName][uniqueIdentifier] and self.data[sheetName][uniqueIdentifier][columnHeaderName] != None:
-                    column_data.append(self.data[sheetName][uniqueIdentifier][columnHeaderName])
+            for uniqueIdentifierInRow in self.__data[sheetName]:
+                if columnHeaderName in self.__data[sheetName][uniqueIdentifierInRow] and self.__data[sheetName][uniqueIdentifierInRow][columnHeaderName] != None:
+                    column_data.append(self.__data[sheetName][uniqueIdentifierInRow][columnHeaderName])
             if column_data:
                 return column_data
             else:
@@ -216,13 +272,28 @@ class ExcelReaderWriter:
     This method is useful for extracting all data in a given row in a given sheet.
     Return Type : Dictonary
     """
-    def readAllDataInGivenRow(self, sheetName, uniqueIdentifier):
-        if sheetName in self.data:
-            if uniqueIdentifier in self.data[sheetName]:
-                row_data = self.data[sheetName][uniqueIdentifier]
+    def readAllDataInGivenRow(self, sheetName, uniqueIdentifierInRow):
+        """
+        This method retrieves all data in a specified row of a given sheet.
+
+        Parameters:
+        sheetName (str): The name of the sheet from which to retrieve data.
+        uniqueIdentifierInRow (str): The unique identifier used to locate the specific row in the sheet.
+
+        Returns:
+        dict: A dictionary containing the data in the specified row if the sheet and row exist.
+        str: A message indicating that the unique identifier or the sheet name was not found if either does not exist.
+        
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> row_data = e.readAllDataInGivenRow('Sheet1', 'E5')
+        """
+        if sheetName in self.__data:
+            if uniqueIdentifierInRow in self.__data[sheetName]:
+                row_data = self.__data[sheetName][uniqueIdentifierInRow]
                 return row_data
             else:
-                return f'Unique Identifier-{uniqueIdentifier} not found in Sheet Name-{sheetName}'
+                return f'Unique Identifier-{uniqueIdentifierInRow} not found in Sheet Name-{sheetName}'
         else:
             return f'Sheet Name-{sheetName} not found in data'
 
@@ -231,7 +302,7 @@ class ExcelReaderWriter:
     This method is used to modify the color and font of a specific cell in an Excel sheet.
     Parameters:
         sheetName (str): The name of the sheet in the workbook.
-        uniqueIdentifier (str): The name of the test case, used to find the specific row in the sheet.
+        uniqueIdentifierInRow (str): The name of the test case, used to find the specific row in the sheet.
         columnHeaderName (str): The name of the column, used to find the specific cell in the row.
         cell_color (str, optional): The color to fill the cell with. Defaults to 'FFFFFF'.
         font_color (str, optional): The color of the font in the cell. Defaults to '000000'.
@@ -240,38 +311,39 @@ class ExcelReaderWriter:
     This method is particularly useful for highlighting specific test cases in an Excel sheet, such as failed test cases in a test suite.
     Return Type : Void
     '''
-    def modifyColorAndFontOfTheCell(self, sheetName, uniqueIdentifier, columnHeaderName , cell_color='FFFFFF', font_color='000000', font_type=False):
-        change_cell_color = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
-        change_font = Font(color=Color(rgb=font_color), bold=font_type)
-        self.excelFilePath = self.__getTempFileName(self.originalFilePath)   # temporary file
-        self.excelFilePath = self.__getTempFileName(os.path.join(self.__getCopyFolder_directory(), os.path.basename(self.originalFilePath)))   # temporary file
-        shutil.copyfile(self.originalFilePath, self.excelFilePath)  # create a copy
-        self.wb = openpyxl.load_workbook(self.excelFilePath)
-        sheet = self.wb[sheetName]
-        colIndex = 1
-        maxRow = sheet.max_row
-        for i in range(1, maxRow + 1):
-            testName = sheet.cell(i, 1).value
-            if testName == uniqueIdentifier:
-                while (sheet.cell(row=1, column=colIndex).value != ''):
-                    if (columnHeaderName == sheet.cell(row=1, column=colIndex).value):
-                        break
-                    colIndex = colIndex + 1
-                # print(sheet.cell(i, colIndex).fill.start_color.index)
-                sheet.cell(i, colIndex).fill = change_cell_color 
-                sheet.cell(i, colIndex).font = change_font 
-                break
-        self.wb.save(self.excelFilePath)
-        self.wb.close()
-        self.__save_and_close()
+    def modifyCellStyles(self, sheetName, uniqueIdentifierInRow, columnHeaderName):
+        """
+        This method creates a CellStyler object for a specific cell in a given sheet.
+
+        Parameters:
+        sheetName (str): The name of the sheet where the cell is located.
+        uniqueIdentifierInRow (str): The unique identifier used to locate the specific row in the sheet.
+        columnHeaderName (str): The name of the column header used to locate the specific column in the sheet.
+
+        Returns:
+        CellStyler: A CellStyler object initialized with the specified cell's details. This object can be used to modify the cell's styles.
+
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> cell_styler = e.modifyCellStyles('Sheet1', 'E5', 'Job Title')
+        """
+        return CellStyler(self.__originalFilePath, self.__getTempFileName, self.__save_and_close, self.__getCopyFolder_directory, sheetName, uniqueIdentifierInRow, columnHeaderName)
 
 
+    def resetCellStyles(self, sheetName, uniqueIdentifierInRow, columnHeaderName):
+        """
+        Resets the styles of a specific cell in an Excel sheet to default values.
 
-if __name__=='__main__':    
-    filepath = 'C:\\Users\\soumyajit.pan\\Documents\\Codes\\RobotProjectToTest_ExcelReaderWriter\\Data\\Employee.xlsx'
-    e = ExcelReaderWriter(filepath)
-    # print(e.readCellData('Sheet1', 'E1', 'Full Name'))
-    # row_data = e.readAllDataInGivenRow('Sheet1', 'E1')
-    # print(row_data['Full Name'])
-    # e.create_headers_in_excel_column('Sheet1')
-    e.modifyColorAndFontOfTheCell('Sheet1', 'E2', 'Full Name', 'FFFFFF', '000000', False)
+        This method creates a CellStyler object for the specified cell, identified by its sheet name, unique identifier in the row, and column header name. It then sets the cell color to white, the font color to black, the font family to Calibri, the font style to normal, and the font size to 11. After applying these styles, it saves the changes to the Excel file.
+
+        Parameters:
+        sheetName (str): The name of the sheet where the cell is located.
+        uniqueIdentifierInRow (str): The unique identifier in the row of the cell.
+        columnHeaderName (str): The column header name of the cell.
+
+        Usage:
+        >>> e = ExcelReaderWriter(...)
+        >>> e.resetCellStyles('Sheet1', 'E7', 'Full Name')
+        """
+        cell_styler = CellStyler(self.__originalFilePath, self.__getTempFileName, self.__save_and_close, self.__getCopyFolder_directory, sheetName, uniqueIdentifierInRow, columnHeaderName)
+        cell_styler.set_cell_color('white').set_font_color('black').set_font_family('Calibri').set_font_styles('normal').set_font_size(11).apply_styles().save_changes()

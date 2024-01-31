@@ -30,10 +30,10 @@ Then, identify the column header that contains your data. In this scenario, the 
 With these parameters - the sheet name, the unique identifier from the first column, and the column header name - you can use the `readCellData` method to read the data. The syntax would be:
 
 ```python
-data = excel_reader_writer.readCellData('SheetName', 'UniqueIdentifier', 'ColumnHeaderName')
+data = excel_reader_writer.readCellData('SheetName', 'UniqueIdentifierInRow', 'ColumnHeaderName')
 ```
 
-In this code, replace `'SheetName'`, `'UniqueIdentifier'`, and `'ColumnHeaderName'` with your actual values (`Sheet1`, `E5`, and `Job Title`, respectively) when you use this method. This will return the data from the specified cell.
+In this code, replace `'SheetName'`, `'UniqueIdentifierInRow'`, and `'ColumnHeaderName'` with your actual values (`Sheet1`, `E5`, and `Job Title`, respectively) when you use this method. This will return the data from the specified cell.
 
 ### Python Usage
 
@@ -45,13 +45,13 @@ from ExcelSheetIO import ExcelReaderWriter
 excel_reader_writer = ExcelReaderWriter('path_to_your_excel_file')
 
 # Use the readCellData method
-data = excel_reader_writer.readCellData('SheetName', 'UniqueIdentifier', 'ColumnHeaderName')
+data = excel_reader_writer.readCellData('SheetName', 'UniqueIdentifierInRow', 'ColumnHeaderName')
 
 # Print the retrieved data
 print(data)
 ```
 
-In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifier'`, and `'ColumnName'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, and the name of the column header, respectively.
+In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifierInRow'`, and `'ColumnName'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, and the name of the column header, respectively.
 
 ### Robot Framework Usage
 
@@ -63,8 +63,8 @@ Library    ExcelSheetIO.ExcelReaderWriter    relative_path_to_your_excel_file
 
 *** Keywords ***
 Keyword for read data from excel sheet
-    [Arguments]    ${sheetName}    ${UniqueIdentifier}    ${ColumnHeaderName}
-    ${data}=    Read Cell Data    ${sheetName}    ${UniqueIdentifier}    ${ColumnHeaderName}
+    [Arguments]    ${sheetName}    ${UniqueIdentifierInRow}    ${ColumnHeaderName}
+    ${data}=    Read Cell Data    ${sheetName}    ${UniqueIdentifierInRow}    ${ColumnHeaderName}
     Log To Console    ${\n}${data}
 
 *** Test Cases ***
@@ -73,9 +73,9 @@ Test case for read data from excel sheet
     [Tags]    read     test
 ```
 
-In the above code, replace `'relative_path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifier'`, and `'ColumnHeaderName'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, and the name of the column header, respectively.
+In the above code, replace `'relative_path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifierInRow'`, and `'ColumnHeaderName'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, and the name of the column header, respectively.
 
-Please replace `'relative_path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifier'`, and `'ColumnHeaderName'` with your actual values (`.\\Data\\Employee.xlsx`, `Sheet1`, `E5`, and `Job Title`, respectively) when you use this code.
+Please replace `'relative_path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifierInRow'`, and `'ColumnHeaderName'` with your actual values (`.\\Data\\Employee.xlsx`, `Sheet1`, `E5`, and `Job Title`, respectively) when you use this code.
 
 ## Method : `Write Data In Excel Sheet`
 
@@ -94,10 +94,10 @@ Finally, determine the data you want to write. In this case, the data is `Sr. An
 With these parameters - the sheet name, the unique identifier from the first column, the column header name, and the data to be written - you can use the `writeCellData` method to write the data. The syntax would be:
 
 ```python
-excel_reader_writer.writeCellData('SheetName', 'UniqueIdentifier', 'ColumnHeaderName', 'WritableData')
+excel_reader_writer.writeCellData('SheetName', 'UniqueIdentifierInRow', 'ColumnHeaderName', 'WritableData')
 ```
 
-In this code, replace `'SheetName'`, `'UniqueIdentifier'`, `'ColumnHeaderName'`, and `'WritableData'` with your actual values (`Sheet1`, `E5`, `Job Title`, and `Sr. Analyst`, respectively) when you use this method. This will write the data into the specified cell. Please ensure that you have write permissions for the Excel file.
+In this code, replace `'SheetName'`, `'UniqueIdentifierInRow'`, `'ColumnHeaderName'`, and `'WritableData'` with your actual values (`Sheet1`, `E5`, `Job Title`, and `Sr. Analyst`, respectively) when you use this method. This will write the data into the specified cell. Please ensure that you have write permissions for the Excel file.
 
 ### Python Usage
 
@@ -111,10 +111,10 @@ from ExcelSheetIO import ExcelReaderWriter
 excel_reader_writer = ExcelReaderWriter('path_to_your_excel_file')
 
 # Use the writeCellData method
-excel_reader_writer.writeCellData('SheetName', 'UniqueIdentifier', 'ColumnHeaderName', 'WritableData')
+excel_reader_writer.writeCellData('SheetName', 'UniqueIdentifierInRow', 'ColumnHeaderName', 'WritableData')
 ```
 
-In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifier'`, `'ColumnHeaderName'`, and `'WritableData'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, the name of the column header, and the order number, respectively.
+In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifierInRow'`, `'ColumnHeaderName'`, and `'WritableData'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, the name of the column header, and the order number, respectively.
 
 ### Robot Framework Usage
 
@@ -126,8 +126,8 @@ Library    ExcelSheetIO.ExcelReaderWriter    path_to_your_excel_file
 
 *** Keywords ***
 Keyword For Write Data in Excel Sheet
-    [Arguments]    ${sheetName}    ${UniqueIdentifier}    ${ColumnHeaderName}    ${WritableData}
-    Write Cell Data    ${sheetName}    ${UniqueIdentifier}    ${ColumnHeaderName}    ${WritableData}
+    [Arguments]    ${sheetName}    ${UniqueIdentifierInRow}    ${ColumnHeaderName}    ${WritableData}
+    Write Cell Data    ${sheetName}    ${UniqueIdentifierInRow}    ${ColumnHeaderName}    ${WritableData}
 
 *** Test Cases ***
 Test case for write data in excel sheet
@@ -135,7 +135,7 @@ Test case for write data in excel sheet
     [Tags]    write     test
 ```
 
-In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifier'`, `'ColumnHeaderName'`, and `'WritableData'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, the name of the column header, and the order number, respectively.
+In the above code, replace `'path_to_your_excel_file'`, `'SheetName'`, `'UniqueIdentifierInRow'`, `'ColumnHeaderName'`, and `'WritableData'` with the path to your Excel file, the name of the sheet in the Excel file, the unique identifier from the first column, the name of the column header, and the order number, respectively.
 
 ### Breakdowns
 
@@ -302,8 +302,8 @@ Library    ExcelSheetIO.ExcelReaderWriter    .\\Data\\Employee.xlsx
 
 *** Keywords ***
 Keyword for read all data in given row in excel sheet
-    [Arguments]    ${sheetName}    ${UniqueIdentifier}
-    ${row_data}=    Read All Data In Given Row    ${sheetName}    ${UniqueIdentifier}
+    [Arguments]    ${sheetName}    ${UniqueIdentifierInRow}
+    ${row_data}=    Read All Data In Given Row    ${sheetName}    ${UniqueIdentifierInRow}
     Log To Console    ${\n}${row_data}
 
 *** Test Cases ***
@@ -343,11 +343,25 @@ from ExcelSheetIO import ExcelReaderWriter
 # Create an instance of the ExcelReaderWriter class
 excel_reader_writer = ExcelReaderWriter('path_to_your_excel_file')
 
-# Use the modifyColorAndFontOfTheCell method, Replace 'sheetName', 'uniqueIdentifier', 'columnHeaderName', cellColor as hex color code, fontColor as hex color code and fontType as boolean  with your actual data
-excel_reader_writer.modifyColorAndFontOfTheCell('sheetName', 'uniqueIdentifier', 'columnHeaderName', 'cellColor', 'fontColor', 'fontType')
+# Use the modifyCellStyles method to create a CellStyler object for a specific cell in a given sheet.
+# Replace 'sheetName', 'uniqueIdentifierInRow', 'columnHeaderName' with your actual data.
+# Then, use the set_cell_color, set_font_color, set_font_type, and font_size methods to set the cell's styles.
+# The color parameters should be hex color codes.
+# The font family should be like 'Arial', 'Bradley Hand ITC' and etc.
+# The font type can be 'bold', 'italic', 'underline', or 'double underline'.
+# The font size should be an integer.
+# The apply_styles method applies the styles to the cell.
+# Finally, the save_changes method saves the changes to the Excel file.
+
+excel_reader_writer.modifyCellStyles('sheetName', 'uniqueIdentifierInRow', 'columnHeaderName').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_type('bold', 'italic', 'underline', 'double underline').font_size(font_size).apply_styles().save_changes()
+
+# or
+
+excel_obj = e.modifyCellStyles('Sheet1', 'E7', 'Full Name').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_type('bold', 'italic', 'underline').set_font_size(11)
+excel_obj.apply_styles().save_changes()
 ```
 
-#### Robot Framework:
+### Robot Framework:
 
 In Robot Framework, you can call this method in a similar way. First, you need to create a keyword that calls this method, and then you can use this keyword in your test case:
 
@@ -356,13 +370,57 @@ In Robot Framework, you can call this method in a similar way. First, you need t
 Library    ExcelSheetIO.ExcelReaderWriter    .\\Data\\Employee.xlsx
 
 *** Keywords ***
-Keyword for modify color and font of the cell in excel sheet
-    [Arguments]    ${sheet_name}    ${test_case_name}    ${column_name}    ${cell_color}    ${font_color}    ${font_type}
-    Modify Color And Font Of The Cell    ${sheet_name}    ${test_case_name}    ${column_name}    ${cell_color}    ${font_color}    ${font_type}
-
+Modify Cell Styles
+    [Arguments]    ${sheet_name}    ${unique_identifier_in_row}    ${column_header_name}    ${cell_color}    ${font_color}  ${font_family}    ${font_type}    ${font_size}
+    ${excel_reader_writer}=    Get Library Instance    ExcelSheetIO.ExcelReaderWriter
+    ${excel_reader_writer}.modifyCellStyles(${sheet_name}, ${unique_identifier_in_row}, ${column_header_name}).set_cell_color(${cell_color}).set_font_color(${font_color}).set_font_family(${font_family}).set_font_type(${font_type}).font_size(${font_size}).apply_styles().save_changes()
 
 *** Test Cases ***
-Test Modify Cell Color And Font
-    Keyword for modify color and font of the cell in excel sheet    Sheet1    E6    Job Title    ffb0b0    Ff0000    True  
-    # Replace 'Sheet1', 'TestCase1', and 'ColumnName' with your sheet name, test case name, and column name
+Test Modify Cell Styles
+    Modify Cell Styles    Sheet1    E6    Job Title    salmon    green  Arial    bold, italic, underline, double underline    12
+    [Tags]    color1     test
+    # Replace 'Sheet1', 'E6', 'Job Title', 'salmon', 'green', 'bold, italic, underline, double underline', and '12' with your sheet name, unique identifier in row, column header name, cell color, font color, font type, and font size respectively
+```
+
+## Method : `Reset Cell Styles`
+
+The `resetCellStyles` method is part of the ExcelReaderWriter class. This method resets the styles of a specific cell in an Excel sheet to default values.
+
+### How it works:
+
+This method creates a `CellStyler` object for the specified cell, identified by its sheet name, unique identifier in the row, and column header name. It then sets the cell color to white, the font color to black, the font family to Calibri, the font style to normal, and the font size to 11. After applying these styles, it saves the changes to the Excel file.
+
+### Python Usage:
+
+Here's how you can use the `resetCellStyles` method in Python:
+
+```python
+# import the ExcelSheetIO library package
+from ExcelSheetIO import ExcelReaderWriter
+
+# Create an instance of the ExcelReaderWriter class
+excel_reader_writer = ExcelReaderWriter('path_to_your_excel_file')
+
+# Use the resetCellStyles method to create a CellStyler object for a specific cell in a given sheet.
+# Replace 'sheetName', 'uniqueIdentifierInRow', 'columnHeaderName' with your actual data.
+excel_reader_writere.resetCellStyles('sheetName', 'uniqueIdentifierInRow', 'columnHeaderName')
+```
+
+### Robot Framework:
+
+In Robot Framework, you can call this method in a similar way. First, you need to create a keyword that calls this method, and then you can use this keyword in your test case:
+
+```robotframework
+*** Settings ***
+Library    ExcelReaderWriter    .\\Data\\Employee.xlsx
+
+*** Keywords ***
+Keyword for reset cell styles in excel sheet
+    [Arguments]    ${sheetName}    ${UniqueIdentifierInRow}     ${columnHeaderName}
+    Reset Cell Styles    ${sheetName}    ${UniqueIdentifierInRow}     ${columnHeaderName}
+
+*** Test Cases ***
+Testcase For Reset Cell Styles
+    Keyword for reset cell styles in excel sheet    Sheet1    E7    Full Name
+    [Tags]    color2     test
 ```
