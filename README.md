@@ -353,11 +353,11 @@ excel_reader_writer = ExcelReaderWriter('path_to_your_excel_file')
 # The apply_styles method applies the styles to the cell.
 # Finally, the save_changes method saves the changes to the Excel file.
 
-excel_reader_writer.modifyCellStyles('sheetName', 'uniqueIdentifierInRow', 'columnHeaderName').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_type('bold', 'italic', 'underline', 'double underline').font_size(font_size).apply_styles().save_changes()
+excel_reader_writer.modifyCellStyles('sheetName', 'uniqueIdentifierInRow', 'columnHeaderName').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_styles('bold', 'italic', 'underline', 'double underline').set_font_size(11).apply_styles().save_changes()
 
 # or
 
-excel_obj = e.modifyCellStyles('Sheet1', 'E7', 'Full Name').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_type('bold', 'italic', 'underline').set_font_size(11)
+excel_obj = e.modifyCellStyles('Sheet1', 'E7', 'Full Name').set_cell_color('salmon').set_font_color('green').set_font_family('Arial').set_font_styles('bold', 'italic', 'underline').set_font_size(11)
 excel_obj.apply_styles().save_changes()
 ```
 
@@ -373,7 +373,7 @@ Library    ExcelSheetIO.ExcelReaderWriter    .\\Data\\Employee.xlsx
 Modify Cell Styles
     [Arguments]    ${sheet_name}    ${unique_identifier_in_row}    ${column_header_name}    ${cell_color}    ${font_color}  ${font_family}    ${font_type}    ${font_size}
     ${excel_reader_writer}=    Get Library Instance    ExcelSheetIO.ExcelReaderWriter
-    ${excel_reader_writer}.modifyCellStyles(${sheet_name}, ${unique_identifier_in_row}, ${column_header_name}).set_cell_color(${cell_color}).set_font_color(${font_color}).set_font_family(${font_family}).set_font_type(${font_type}).font_size(${font_size}).apply_styles().save_changes()
+    ${excel_reader_writer}.modifyCellStyles(${sheet_name}, ${unique_identifier_in_row}, ${column_header_name}).set_cell_color(${cell_color}).set_font_color(${font_color}).set_font_family(${font_family}).set_font_styles(${font_type}).set_font_size(${font_size}).apply_styles().save_changes()
 
 *** Test Cases ***
 Test Modify Cell Styles
